@@ -1,0 +1,262 @@
+%!TEX root=../document.tex
+
+\section{Ergebnisse}
+\label{sec:Ergebnisse}
+
+Der Grundaufbau besteht aus einem Client Java Programm, welches über das Remote Method Invocation ("RMI") Protokoll einen Server kontaktiert, welcher dann wiederum eine beliebige Aufgabe für diesen Client ausführt.
+
+Diese Aufgabe ("Task") soll generisch sein, sodass verschiedene Implementationen von beliebigen Aufgaben ausgeführt werden können, wie beispielsweise die Berechnung von Pi oder der Fibonacci Nummer.
+
+Um die Aufgabe zu erweitern, wird ein Proxy zwischen die Clients und Server geschalten, welcher dann einzelne Anfragen der Clients mittels Round Robin Konzept gleichgerecht auf die einzelnen Server verteilt.
+
+\subsection{Projekt}
+Als Entwicklungsumgebung wird IntelliJ IDEA von JetBrains [1] verwendet. Es wird ein neues Projekt erstellt, mit folgenden packages/submodules:
+\begin{itemize}
+    \item \textbf{Client}: Client-side RMI implementierung
+    \item \textbf{Server}: Server-side RMI implementierung, inkl. Load Balancer
+    \item \textbf{Modules}: Shared-code, u.a. die generische \textbf{Task<T>} klasse, Pi und Fibonacci implementierungen, etc.
+\end{itemize}
+
+\clearpage
+
+\subsection{Module}
+Bevor der Client oder Server implementiert werden kann, muss eine basis gebaut werden. Es werden Funktionen implementiert, welche Client \textbf{und} Server verwenden. Unter anderem gehört dazu:
+
+\subsubsection{Compute}
+Es muss ein Interface definiert werden, welches als Stub [1] dient, also die Schnittstelle zur Implementierung für den \textbf{Task} auf einer anderen Codebase.
+
+Die Implementierung ist sehr simpel, es besteht aus einem Interface mit der \textbf{run()} Funktion:
+
+\begin{lstlisting}[style=Java, caption=Module Implementation - Compute interface]
+public interface Compute extends Remote, Serializable {
+    <T> T run(Task<T> t) throws RemoteException;
+}
+\end{lstlisting}
+
+\subsubsection{Task}
+Es muss ein Generisches Interface definiert werden, welches auch nur eine \textbf{run()} Funktion aufweist:
+
+\begin{lstlisting}[style=Java, caption=Module Implementation - Task interface]
+public interface Task<T> {
+	T run();
+}
+\end{lstlisting}
+
+Dieses Interface ist dazu da, um jeden beliebigen Auftrag auszuführen, ohne die Implementierung (bzw. \textbf{run()}-Methode) zu kennen.
+
+\subsubsection{Fibonacci}
+Nun kann eine Tatsächliche Aufgabe implementiert werden, als erstes Beispiel wird Fibonacci verwendet.
+
+Die Klasse Fibonacci soll aus \textbf{Task<BigInteger>} erben da es ein Task mit dem Rückgabewert BigInteger ist, sowie aus \textbf{Serializable}, damit aus dem Memory void* ein serialisiertes byte array gebaut werden kann.
+
+Das serialisierte byte array kann somit über die Netzwerkschnittstelle gesendet werden.
+
+Für die Serilization wird außerdem eine statische, final Konstante aus einem 64bit Integer erstellt, welche quasi einen Identifier darstellt welcher der Serilisation erkennbar gibt, dass es sich um die selbe Implementierung einer Klasse handelt.
+
+Die \textbf{run()} Methode schaut folgendermaßen aus:
+
+\begin{lstlisting}[style=Java, caption=Module Implementation - Fibonacci run]
+@Override
+public BigInteger run() {
+	BigInteger previous = BigInteger.ONE;
+    BigInteger recent = BigInteger.ONE;
+    for (int i = 0; i < _digits; i++) {
+    	BigInteger temp = previous.add(recent);
+        previous = recent;
+        recent = temp;
+	}
+	return recent;
+}
+\end{lstlisting}
+
+
+\subsubsection{Pi}
+Die Implementation für die Berechnung von Pi ist etwas komplizierter, hierbei wird ein Tutorial von Oracle verwendet (leicht abgeändert):
+
+\begin{lstlisting}[style=Java, caption=Module Implementation - Pi run]
+@Override
+public BigDecimal run() {
+	int scale = _digits + 5;
+    BigDecimal arctan1_5 = arctan(5, scale);
+    BigDecimal arctan1_239 = arctan(239, scale);
+    BigDecimal pi = arctan1_5.multiply(FOUR).subtract(
+					arctan1_239).multiply(FOUR);
+    return pi.setScale(_digits,
+                       BigDecimal.ROUND_HALF_UP);
+}
+\end{lstlisting}
+
+Wobei die arctan folgende Implementation hat:
+
+\begin{lstlisting}[style=Java, caption=Module Implementation - Pi arctan]
+public static BigDecimal arctan(int inverseX,
+                                int scale) {
+	BigDecimal result, numer, term;
+    BigDecimal invX = BigDecimal.valueOf(inverseX);
+    BigDecimal invX2 =
+    BigDecimal.valueOf(inverseX * inverseX);
+	numer = BigDecimal.ONE.divide(invX,
+    							  scale, roundingMode);
+    result = numer;
+    int i = 1;
+    do {
+		numer = numer.divide(invX2, scale, roundingMode);
+		int denom = 2 * i + 1;
+        term = numer.divide(BigDecimal.valueOf(denom), scale, roundingMode);
+		if ((i % 2) != 0) {
+        	result = result.subtract(term);
+        } else {
+            result = result.add(term);
+        }
+        i++;
+    } while (term.compareTo(BigDecimal.ZERO) != 0);
+    return result;
+}
+\end{lstlisting}
+
+\clearpage
+
+\subsection{Client}
+
+Es wird ein simpler Client implementiert, welcher den Server (bzw. Proxy) mittels RMI kontaktieren soll.
+
+Als implementierung muss in der System Registry nach dem Stub [2] gesucht werden, welcher die Schnittstelle zu dem Server (bzw. Proxy) darstellt.
+
+\begin{lstlisting}[style=Java, caption=Client Implementation - Registry lookup]
+public Client(String host, String stubName) throws RemoteException, NotBoundException {
+    _registry = LocateRegistry.getRegistry(host);
+    _compute = (Compute)_registry.lookup(stubName);
+}
+\end{lstlisting}
+
+
+Der Client kann mit dem gefundenen Stub nun jeden beliebigen Task ausführen:
+
+\begin{lstlisting}[style=Java, caption=Client Implementation - Task run]
+public <T> T run(Task<T> task) throws RemoteException {
+    return _compute.run(task);
+}
+\end{lstlisting}
+
+\subsubsection{Beispiel}
+
+Als Beispiel kann dieser Client die Fibonacci Number berechnen lassen:
+
+\begin{lstlisting}[style=Java, caption=Client Implementation - Fibonacci Beispiel]
+Fibonacci fibonacci = new Fibonacci(5);  // Fibonacci Number bis 5
+BigInteger number = client.run(fibonacci);
+\end{lstlisting}
+
+\clearpage
+
+\subsection{Server}
+Es wird ein basis-Interface definiert, welches den Zugriff für den Proxy später vereinfachen wird. Das Interface wird \textbf{Processor} genannt, und erweitert die \textbf{Compute} Klasse. 
+Der Interface definiert nur eine Funktion: \textbf{busy()}, welche einen boolean wert zurückliefer.
+
+Der Server ist die Implementierung der \textbf{Processor} Klasse, welche eine \textbf{run()} Methode besitzt um einen beliebigen Task<T> auszuführen, und das Ergebnis zurück zu liefern.
+
+Für die \textbf{busy()} Methode wird eine Variable namens \textbf{busy} gespeichert, welche besagt, ob der Server gerade beschäftigt ist oder nicht.
+
+\begin{lstlisting}[style=Java, caption=Server Implementation - run Methode]
+@Override
+public <T> T run(Task<T> task) throws RemoteException {
+	try {
+    	_busy = true;
+        T result = task.run();
+        JLogger.Instance.Log(Logger.Severity.Info, "Executed Task \"" + task.toString() + "\", at " + new Date().toString());
+		return result;
+    } finally {
+    	_busy = false;
+    }
+}
+\end{lstlisting}
+
+\clearpage
+
+\subsection{Proxy}
+Nun kann ein Proxy zwischen Client und Server geschaltet werden.
+
+\subsubsection{Idee}
+Der Proxy, welcher für den Client als ein einziger Server erscheint, dient dazu, die (mehreren-) Anfragen von Clients gleichmäßig auf registrierte Server zu verteilen.
+
+Umgesetzt wird das ganze mittels dem Round Robin Konzept, welches den Servern jeweils eine Aufgabe gibt. Sobald jeder Server einmal gearbeitet hat, wird der Zyklus zurückgesetzt und es wird wieder bei dem ersten Server angefangen.
+
+\subsubsection{Implementierung}
+Es wird ein Interface definiert, welches den Round Robin Load Balancer Proxy beschreibt.
+
+\begin{lstlisting}[style=Java, caption=Proxy Implementation - LoadBalancer Interface]
+public interface LoadBalancer extends Compute {
+    void add(Processor processor) throws RemoteException;
+	boolean remove(Processor processor) throws RemoteException;
+}
+\end{lstlisting}
+
+Das Interface erweitert Compute, da es ja Aufgaben (Tasks) berechnet (run).
+
+Außerdem ist deutlich erkennbar, dass das Interface exakt wie ein normaler Server ausschaut, da Clients nicht wissen müssen, dass Sie mit einem Proxy kommunizieren.
+
+Als nächstes wird das Interface in einer Klasse \textbf{"Proxy"} implementiert.
+Es werden folgende Objekt-Member erstellt:
+
+\begin{itemize}
+	\item logger: Ein beliebiger Logger, hierbei wird er zu dem System.out Stream weitergeleitet.
+	\item processors: Eine List<Processor> welche alle registrierten Prozessoren (Server) speichert.
+	\item iter: Ein Iterator<Processor> zu der Liste aus Prozessoren, welcher den Fortschritt in einem Round Robin Zyklus speichert.
+\end{itemize}
+
+Die Methoden \textbf{add()} und \textbf{remove()} sind sehr trivial, da sie hierbei nur die processors liste bearbeiten, und den iterator zurücksetzen;
+
+\begin{lstlisting}[style=Java, caption=Proxy Implementation - Proxy::add]
+@Override
+public void add(Processor processor) throws RemoteException {
+    _processors.add(processor);
+    _iter = _processors.iterator();
+    _logger.Log(Logger.Severity.Info,
+            "Registered new Server: \"" + processor + "\"");
+}
+\end{lstlisting}
+
+\begin{lstlisting}[style=Java, caption=Proxy Implementation - Proxy::remove]
+@Override
+public boolean remove(Processor processor) throws RemoteException {
+    boolean success = _processors.remove(processor);
+    _iter = _processors.iterator();
+    if(success)
+        _logger.Log(Logger.Severity.Info,
+                "Removed Server: \"" + processor + "\"");
+    return success;
+}
+\end{lstlisting}
+
+Und nun kann die \textbf{run()} Methode des Proxy implementiert werden, welche auch nur den Task einem Server weitergibt;
+
+\begin{lstlisting}[style=Java, caption=Proxy Implementation - Proxy::run]
+@Override
+public <T> T run(Task<T> t) throws RemoteException {
+    do {
+        if (_iter.hasNext())
+            _iter = _processors.iterator();
+
+        Processor p = _iter.next();
+        if (!p.busy()) {
+            return p.run(t);
+        }
+    } while(true);
+}
+\end{lstlisting}
+
+Der Iterator wird überprüft ob er am Ende angelangt ist, falls dies der Fall ist, wird er zurückgesetzt.
+Danach wird ein Prozessor (Server) aus der Liste geholt, und der Iterator weitergeschoben.
+Falls dieser Prozessor nicht gerade beschäftigt ist, kann der Task an den Prozessor weitergereicht werden, und auf ein Ergebnis gewartet werden.
+
+Der Proxy kann auch so konfiguriert werden, dass er den Prozessoren unabhängig davon ob sie beschäftigt sind oder nicht, die Tasks weitergibt, wodurch aber viel beschäftigte Server eine Lange Arbeitskette (Task Queue/Stack) haben könnten.
+
+\clearpage
+
+\subsection{Glossar}
+\begin{enumerate}
+    \item \href{https://www.jetbrains.com/idea}{\color{blue}\underline{''IntelliJ IDEA - JetBrains''}}
+    \item ''Stub:'' eine Schnittstelle zu Funktionen oder Prozeduren, welche auf einem anderen System implementiert sind.
+\end{enumerate}
+
+

@@ -1,0 +1,71 @@
+%!TEX root=../document.tex
+
+\section{Einführung}
+Verteilte Objekte haben bestimmte Grunderfordernisse, die mittels implementierten Middlewares leicht verwendet werden können. Das Verständnis hinter diesen Mechanismen ist aber notwendig, um funktionale Anforderungen entsprechend sicher und stabil implementieren zu können.
+
+\subsection{Ziele}
+Diese Übung gibt eine einfache Einführung in die Verwendung von verteilten Objekten mittels Java RMI. Es wird speziell Augenmerk auf die Referenzverwaltung sowie Serialisierung von Objekten gelegt. Es soll dabei eine einfache verteilte Applikation in Java implementiert werden.
+
+
+
+
+\subsection{Voraussetzungen}
+\begin{itemize}
+	\item Grundlagen Java
+	\item Grundlagen zu verteilten Systemen und Netzwerkverbindungen
+	\item Grundlegendes Verständnis von nebenläufigen Prozessen
+\end{itemize}
+
+\subsection{Aufgabenstellung}
+Folgen Sie dem offiziellen Java-RMI Tutorial, um eine einfache Implementierung des PI-Calculators zu realisieren. Beachten Sie dabei die notwendigen Schritte der Sicherheitseinstellungen (SecurityManager) sowie die Verwendung des RemoteInterfaces und der RemoteException.
+
+Als Implementierungsgrundlage dient folgender Classroom-Link.
+
+Implementieren Sie einen weiteren Task nach dem Command-Pattern [2] mittels RMI und übertragen Sie die Berechnung an den Server. Erweitern Sie die Implementierung des Tutorials ohne große Anpassungen. Erstellen Sie zum Beispiel einen Task zur berechnung der Fibonacci-Folge [3] und führen Sie diesen nebst der Pi-Berechnung aus.
+
+Die Erweiterung dieser Aufgabe wäre ein Loadbalancer-Interface auf der Server-Seite, die Anfragen an eine Compute-Instanz an weitere Server weiterleitet. Der Client soll dabei gar nicht geändert werden. Es soll möglich sein, dass mehrere Server sich beim Loadbalancer registrieren können und für Berechnungen (computeTask) zur Verfügung stehen. Der Loadbalancer hat dabei nur eine verwaltende Tätigkeit zu übernehmen und erscheint für den Client weiterhin als Implementierung des Compute-Interfaces. Es bleibt Ihnen überlassen, wie die Verwaltung der Server-Stubs beim Loadbalancer umgesetzt wird. Es ist eine einfache Round-Robin-Verteilung zu implementieren.
+
+Die Implementierung soll grundsätzlich auch über die Systemgrenzen funktionstüchtig sein (Achtung wegen RMI-Registry und Verwendung der RMI-Stubs).
+
+\subsection{Bewertung}
+
+Die Abgabe erfolgt durch das Repository. Bitte nicht auf regelmäßige Commits mit sprechenden Commitmessages vergessen. Zur Bewertung soll das Protokoll folgendermaßen ausgedruckt werden: ''Hochformat; 2 Seiten pro Blatt und über die lange Seite drehen'' (damit kommen vier Seiten auf ein Blatt A4).
+
+\begin{itemize}
+	\item Gruppengrösse: 1 Person
+	\item Anforderungen ''Grundkompetenz''
+		\begin{itemize}
+			\item Dokumentation und Beschreibung anhand der Protokollrichtlinien
+		\end{itemize}
+
+		\begin{itemize}
+			\item Java RMI-Tutorial um ''sauberes Schließen'' erweitern
+		\end{itemize}
+
+		\begin{itemize}
+			\item Implementierung eines neuen Tasks (z.B. Fibonacci)
+		\end{itemize}
+
+		\begin{itemize}
+			\item Implementierung eines Loadbalancer-Interfaces (register/unregister)
+		\end{itemize}
+	\item Anforderungen ''Erweiterte Kompetenz''
+		\begin{itemize}
+			\item Client-Loadbalancer-Server-Verbindungen über mehrere Rechner hinweg lauffähig (z.B. mittels Portweiterleitung)
+		\end{itemize}
+
+		\begin{itemize}
+			\item Überlegungen zum Design und mögliche Implementierung weiterer Loadbalancing-Methoden (Weighted Distribution oder Least Connections)
+		\end{itemize}
+\end{itemize}
+
+\subsection{Quellen}
+
+\begin{enumerate}
+	\item \href{http://docs.oracle.com/javase/tutorial/rmi/}{\color{blue}\underline{''The Java Tutorials - Trail RMI''}}
+	\item \href{http://vincehuston.org/dp/command.html}{\color{blue}\underline{''Command Pattern'', Vince Huston}}
+	\item \href{https://en.wikibooks.org/wiki/Algorithm_Implementation/Mathematics/Fibonacci_Number_Program}{\color{blue}\underline{''Fibonacci Number Program'', wikibooks}}
+\end{enumerate}
+
+\clearpage
+
