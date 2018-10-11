@@ -20,8 +20,10 @@ Wenn allerdings nur mit einem Server kommuniziert wird und dieser dann plötzlic
 - __Welcher Unterschied besteht zwischen einer "server-side" bzw "client-side" Lastverteilungslösung?__  
 Beim serverseitigen Loadbalancer gehen die Anfragen des Clients an eine Schnittstelle zwischen dem Client und der Serverfarm. Dabei werden von dieser Schnittstelle die Anfragen auf die entsprechenden Server, je nach loadbalancing-Methode aufgeteilt.(Früher die meist genütze Art)  
 Beim clientseitigen Loadbalancer (wird aktuell immer beliebter)
-- __Was versteht man unter dem "Mega-Proxy-Problem"?__
-
+- __Was versteht man unter dem "Mega-Proxy-Problem"?__  
+Wenn über die IP-Adresse des Clients das Loadbalancing betrieben wird, dann kann man nicht sagen ob das der selbe Client ist oder nicht.  
+Als Beispiel nehmen wir das TGM. Hier hat jeder nach außen die selbe IP-Adresse.  
+Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn dieser zum Server1 weiter. Kommt nun von Client2 auch eine Anfrage an diesen Loadbalancer, dann denkt er aufgrund der selben IP-Adresse, dass das der Client1 ist und leitet ihn wieder zu Server1 weiter.  [4]
 
 ## Design und Beschreibung
 
@@ -33,3 +35,4 @@ Beim clientseitigen Loadbalancer (wird aktuell immer beliebter)
 [1] https://www.jscape.com/blog/load-balancing-algorithms  
 [2] https://www.digitalocean.com/community/tutorials/what-is-high-availability  
 [3] https://www.nginx.com/resources/glossary/session-persistence/  
+[4] Prof. Borko Erklärung :)
