@@ -27,12 +27,26 @@ Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn
 -> Mega Proxy Problem
 
 ## Design und Beschreibung
-### Weighted Round Robin
+### Weighted Round Robin - Theorie
 Bei dieser Loadbalancing Methode bekommen die Server einen "Weight"-Wert zugewiesen. Dieser gibt an, wie viele andere Tasks der Server noch ausrechnen kann. Ein Server mit einer höheren Rechenleistung und mehr RAM wird einen höheren Wert haben als ein schwächerer.  
 Sobald der Server einen Task zum ausrechnen bekommt, wird der Wert um einen speziellen Faktor, je nach Schwierigkeit der Rechnung, verkleinert. Sobald die Rechnung fertig ist, wird der Faktor wieder dazu addiert.  
 Solange der Wert des Servers noch größer als eine bestimmte Zahl ist, können ihm noch Tasks zugewiesen werden.
 
 ## Implementierung
+### Java Socket Exception
+Sollte eine Java Socket Exception auftreten, dann hängt das sicher mit der Java Policy zusammen. Diese muss den Zugriff über die Ports auf localhost erlauben.  
+Dazu geht man in folgende Files:  
+- "C:\Program Files\Java\jdk1.8.0_181\jre\lib\security\javaws.policy"  
+- "C:\Program Files\Java\jdk1.8.0_181\jre\lib\security\java.policy"  
+
+__ACHTUNG!__ Das was jetzt kommt ist ein Quick n dirty Pfusch. Dieser sollte nach der Übung wieder rausgenommen werden.  
+Es wird folgender Code-Snippet oben ins File hinzugefügt:  
+
+    grant {
+        permission java.security.AllPermission;
+    };     
+
+### Weighted Round Robin Implementierung
 Das Grundgerüst (Round Robin) war von Marc Rousavy. Darauf wurde in dieser Übung aufgebaut und ein Weighted Round Robin implementiert.  
 Dazu wurden Getter Methoden in die Interfaces "process" und "task" eingebaut. Mit denen kann man im Loadbalancer auf die "weight"-Werte zugreifen.  
 Für die Weight der Tasks wurde die Nachkommazahl/500 gerechnet. Das ist ein frei gewählter Wert, den man nach belieben anpassen kann.  
