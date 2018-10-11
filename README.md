@@ -31,7 +31,9 @@ Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn
 Bei dieser Loadbalancing Methode bekommen die Server einen "Weight"-Wert zugewiesen. Dieser gibt an, wie viele andere Tasks der Server noch ausrechnen kann. Ein Server mit einer höheren Rechenleistung und mehr RAM wird einen höheren Wert haben als ein schwächerer.  
 Sobald der Server einen Task zum ausrechnen bekommt, wird der Wert um einen speziellen Faktor, je nach Schwierigkeit der Rechnung, verkleinert. Sobald die Rechnung fertig ist, wird der Faktor wieder dazu addiert.  
 Solange der Wert des Servers noch größer als eine bestimmte Zahl ist, können ihm noch Tasks zugewiesen werden.
+
 ## Implementierung
+Das Grundgerüst (Round Robin) war von Marc Rousavy. Darauf wurde in dieser Übung aufgebaut und ein Weighted Round Robin implementiert.
 
 ## Deployment
 
