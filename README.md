@@ -23,7 +23,8 @@ Beim clientseitigen Loadbalancer (wird aktuell immer beliebter in manchen Anwend
 - __Was versteht man unter dem "Mega-Proxy-Problem"?__  
 Wenn über die IP-Adresse des Clients das Loadbalancing betrieben wird, dann kann man nicht sagen ob das der selbe Client ist oder nicht.  
 Als Beispiel nehmen wir das TGM. Hier hat jeder nach außen die selbe IP-Adresse.  
-Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn dieser zum Server1 weiter. Kommt nun von Client2 auch eine Anfrage an diesen Loadbalancer, dann denkt er aufgrund der selben IP-Adresse, dass das der Client1 ist und leitet ihn wieder zu Server1 weiter.  [5]
+Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn dieser zum Server1 weiter. Kommt nun von Client2 auch eine Anfrage an diesen Loadbalancer, dann denkt er aufgrund der selben IP-Adresse, dass das der Client1 ist und leitet ihn wieder zu Server1 weiter.  [5]  
+-> Mega Proxy Problem
 
 ## Design und Beschreibung
 
