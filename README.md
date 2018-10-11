@@ -15,8 +15,8 @@ Mehrere redundante Nodes (Server) werden zusammen zu Clustern verbunden. Jede No
 Unter dem Begriff versteht man, dass wenn sich ein User mit einem Server verbindet, dass dieser für alle seine Anfragen, solange die Session besteht, zuständig ist. Um die Performance zu verbessern haben die Server gespeichert wohin sich der User am wahrscheinlichsten als nächsten Schritt hinverbinden will/welche Informationen er abrufen will.  
 Um die Geschwindigkeit der Anfragen zu erhöhen, ist es also sinnvoll alle Anfragen vom selben User auf einen Server zu leiten.  
 - __Nennen Sie jeweils ein Beispiel, wo Session Persistenz notwendig bzw. nicht notwendig ist.__  
-Sinnvoll ist es, wie schon bereits oben erwähnt, dass man bei einem Webseiten besuch schneller ist.  
-Wenn allerdings nur mit einem Server kommuniziert wird und dieser dann plötzlich während einer Transaktion ausfällt, dann besteht die Möglichkeit das Informationen verloren gehen.[3]  
+Sinnvoll ist es, wie schon bereits oben erwähnt, dass man bei einem Webseitenbesuch schneller ist.  
+Wenn allerdings nur mit einem Server kommuniziert wird und dieser dann plötzlich während einer Transaktion ausfällt, dann besteht die Möglichkeit das Informationen verloren gehen - hier wären mehrere Server sinnvoller.[3]  
 - __Welcher Unterschied besteht zwischen einer "server-side" bzw "client-side" Lastverteilungslösung?__  
 Beim serverseitigen Loadbalancer gehen die Anfragen des Clients an eine Schnittstelle zwischen dem Client und der Serverfarm. Dabei werden von dieser Schnittstelle die Anfragen auf die entsprechenden Server, je nach loadbalancing-Methode aufgeteilt.(Früher die meist genütze Art)  
 Beim clientseitigen Loadbalancer (wird aktuell immer beliebter in manchen Anwendungsbereichen) fällt die eigentliche Idee vom Loadbalancing weg, da es die Middleware Schnittstelle nicht mehr gibt. Der Client hat eine Liste von Servern (IPs) und wählt random oder nach einem Algorithmus den Server aus.[4]  
