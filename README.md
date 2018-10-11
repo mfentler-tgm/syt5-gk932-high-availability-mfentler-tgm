@@ -33,7 +33,10 @@ Sobald der Server einen Task zum ausrechnen bekommt, wird der Wert um einen spez
 Solange der Wert des Servers noch größer als eine bestimmte Zahl ist, können ihm noch Tasks zugewiesen werden.
 
 ## Implementierung
-Das Grundgerüst (Round Robin) war von Marc Rousavy. Darauf wurde in dieser Übung aufgebaut und ein Weighted Round Robin implementiert.
+Das Grundgerüst (Round Robin) war von Marc Rousavy. Darauf wurde in dieser Übung aufgebaut und ein Weighted Round Robin implementiert.  
+Dazu wurden Getter Methoden in die Interfaces "process" und "task" eingebaut. Mit denen kann man im Loadbalancer auf die "weight"-Werte zugreifen.  
+Für die Weight der Tasks wurde die Nachkommazahl/500 gerechnet. Das ist ein frei gewählter Wert, den man nach belieben anpassen kann.  
+Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genommen.
 
 ## Deployment
 
