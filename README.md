@@ -19,11 +19,11 @@ Sinnvoll ist es, wie schon bereits oben erwähnt, dass man bei einem Webseiten b
 Wenn allerdings nur mit einem Server kommuniziert wird und dieser dann plötzlich während einer Transaktion ausfällt, dann besteht die Möglichkeit das Informationen verloren gehen.[3]  
 - __Welcher Unterschied besteht zwischen einer "server-side" bzw "client-side" Lastverteilungslösung?__  
 Beim serverseitigen Loadbalancer gehen die Anfragen des Clients an eine Schnittstelle zwischen dem Client und der Serverfarm. Dabei werden von dieser Schnittstelle die Anfragen auf die entsprechenden Server, je nach loadbalancing-Methode aufgeteilt.(Früher die meist genütze Art)  
-Beim clientseitigen Loadbalancer (wird aktuell immer beliebter)
+Beim clientseitigen Loadbalancer (wird aktuell immer beliebter in manchen Anwendungsbereichen) fällt die eigentliche Idee vom Loadbalancing weg, da es die Middleware Schnittstelle nicht mehr gibt. Der Client hat eine Liste von Servern (IPs) und wählt random oder nach einem Algorithmus den Server aus.[4]  
 - __Was versteht man unter dem "Mega-Proxy-Problem"?__  
 Wenn über die IP-Adresse des Clients das Loadbalancing betrieben wird, dann kann man nicht sagen ob das der selbe Client ist oder nicht.  
 Als Beispiel nehmen wir das TGM. Hier hat jeder nach außen die selbe IP-Adresse.  
-Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn dieser zum Server1 weiter. Kommt nun von Client2 auch eine Anfrage an diesen Loadbalancer, dann denkt er aufgrund der selben IP-Adresse, dass das der Client1 ist und leitet ihn wieder zu Server1 weiter.  [4]
+Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn dieser zum Server1 weiter. Kommt nun von Client2 auch eine Anfrage an diesen Loadbalancer, dann denkt er aufgrund der selben IP-Adresse, dass das der Client1 ist und leitet ihn wieder zu Server1 weiter.  [5]
 
 ## Design und Beschreibung
 
@@ -35,4 +35,5 @@ Wenn nun von dem einen Client eine Anfrage an den Loadbalancer kommt, leitet ihn
 [1] https://www.jscape.com/blog/load-balancing-algorithms  
 [2] https://www.digitalocean.com/community/tutorials/what-is-high-availability  
 [3] https://www.nginx.com/resources/glossary/session-persistence/  
-[4] Prof. Borko Erklärung :)
+[4] https://soaessentials.com/client-side-load-balancing-vs-server-side-load-balancing-how-client-side-load-balancing-works/  
+[5] Prof. Borko Erklärung :)  
