@@ -22,3 +22,4 @@ Der Server mit den höheren Specs bekommt mehr Anfragen zugewiesen.
 ## Deployment
 
 ## Quellen
+[1] https://www.jscape.com/blog/load-balancing-algorithms  
