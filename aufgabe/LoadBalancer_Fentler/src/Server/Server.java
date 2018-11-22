@@ -22,6 +22,7 @@ public class Server implements Processor {
     private LoadBalancer _balancer;
     private String _name;
     private int weight;
+    private String taskName;
 
     public Server(String name, int port)
             throws RemoteException {
@@ -33,16 +34,18 @@ public class Server implements Processor {
     }
 
     /**
-     * Die Methode setzt die Weight des Servers bei einer neuen Berechnung - der Weight vom Task. Wenn die Berechnung fertig ist, erhöht sie ihn wieder
-     * @Author: Mario Fentler
+     * Die Methode setzt die Weight des Servers bei einer neuen Berechnung - der Weight vom Task.
+     * Wenn die Berechnung fertig ist, erhöht sie ihn wieder.
+     *
      * @param task
      * @param <T>
      * @return
      * @throws RemoteException
+     * @Author: Mario Fentler
      */
     @Override
     public <T> T run(Task<T> task) throws RemoteException {
-        try {
+        try{
             setWeight(getWeight() - task.getWeight());
             T result = task.run();
             JLogger.Instance.Log(Logger.Severity.Info,
@@ -71,13 +74,14 @@ public class Server implements Processor {
     }
 
     @Override
-    public int getWeight(){
+    public int getWeight() {
         return weight;
     }
 
     @Override
-    public void setWeight(int weight){
+    public void setWeight(int weight) {
         this.weight = weight;
     }
+
 
 }

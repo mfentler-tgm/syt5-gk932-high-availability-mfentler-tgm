@@ -28,7 +28,7 @@ public class Client {
      */
     public Client(String host, String stubName) throws RemoteException, NotBoundException {
         _registry = LocateRegistry.getRegistry(host);
-        _compute = (Compute)_registry.lookup(stubName);
+        _compute = (Compute) _registry.lookup(stubName);
     }
 
     /*

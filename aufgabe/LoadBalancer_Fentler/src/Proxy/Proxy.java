@@ -49,7 +49,7 @@ public class Proxy implements LoadBalancer {
     public boolean remove(Processor processor) throws RemoteException {
         boolean success = _processors.remove(processor);
         _iter = _processors.iterator();
-        if(success)
+        if (success)
             _logger.Log(Logger.Severity.Info,
                     "Removed Server: \"" + processor + "\"");
         return success;
@@ -79,11 +79,13 @@ public class Proxy implements LoadBalancer {
             if (!_iter.hasNext())
                 _iter = _processors.iterator();
 
+            System.out.println("New task request...");
             System.out.println("Task weight: " + t.getWeight());
             while (_iter.hasNext()) {
                 Processor p = _iter.next();
                 if (!(p.getWeight() - t.getWeight() < 0)) {
                     return p.run(t);
+
                     //return p.run(t);
                 } else {
                     System.out.println("Nächster Server wird ausgewählt.");
@@ -91,6 +93,6 @@ public class Proxy implements LoadBalancer {
             }
 
             //return p.run(t);
-        } while(true);
+        } while (true);
     }
 }

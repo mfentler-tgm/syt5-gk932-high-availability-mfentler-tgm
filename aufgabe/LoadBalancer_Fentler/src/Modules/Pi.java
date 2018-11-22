@@ -30,13 +30,12 @@ public class Pi implements Task<BigDecimal>, Serializable {
      * number of digits after the decimal point.  The value
      * is computed using the power series expansion for the
      * arc tangent:
-     *
+     * <p>
      * arctan(x) = x - (x^3)/3 + (x^5)/5 - (x^7)/7 +
-     *     (x^9)/9 ...
+     * (x^9)/9 ...
      */
     public static BigDecimal arctan(int inverseX,
-                                    int scale)
-    {
+                                    int scale) {
         BigDecimal result, numer, term;
         BigDecimal invX = BigDecimal.valueOf(inverseX);
         BigDecimal invX2 =
@@ -66,11 +65,12 @@ public class Pi implements Task<BigDecimal>, Serializable {
 
     /**
      * Die Methode gibt mir die Schwierigkeit der Rechnung zurück
-     * @Author: Mario Fentler
+     *
      * @return
+     * @Author: Mario Fentler
      */
     @Override
-    public int getWeight(){
-        return (int)_digits/500;
+    public int getWeight() {
+        return (int) _digits / 500;
     }
 }

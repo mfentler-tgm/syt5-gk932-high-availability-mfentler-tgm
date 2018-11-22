@@ -5,5 +5,8 @@ import java.rmi.RemoteException;
 
 public interface Task<T> {
     T run();
+
     int getWeight();
+
+
 }

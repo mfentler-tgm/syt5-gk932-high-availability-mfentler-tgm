@@ -10,9 +10,9 @@ public class JLogger implements Logger<String> {
     private PrintStream stream;
 
     public JLogger(PrintStream stream) {
-        if (stream == null){
+        if (stream == null) {
             this.stream = System.out;
-        } else{
+        } else {
             this.stream = stream;
         }
     }

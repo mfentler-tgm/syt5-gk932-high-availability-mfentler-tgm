@@ -44,19 +44,67 @@ Es wird folgender Code-Snippet oben ins File hinzugefügt:
 
     grant {
         permission java.security.AllPermission;
-    };     
+    };   
+__Besser:__  
+In ein File den Code von oben einfügen und dann bei den VM Parametern in der Start-Konfig folgende Syntax hinzufügen. 
+Das hat den Vorteil, dass man keine Sicherheitslücken im System erstellt und die Policy nur solange gilt, solange das Programm läuft.  
+
+	-Djava.security.policy=/some/path/my.policy
 
 ### Weighted Round Robin Implementierung
 Das Grundgerüst (Round Robin) war von Marc Rousavy. Darauf wurde in dieser Übung aufgebaut und ein Weighted Round Robin implementiert.  
 Dazu wurden Getter Methoden in die Interfaces "process" und "task" eingebaut. Mit denen kann man im Loadbalancer auf die "weight"-Werte zugreifen.  
 Für die Weight der Tasks wurde die Nachkommazahl/500 gerechnet. Das ist ein frei gewählter Wert, den man nach belieben anpassen kann.  
-Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genommen.
+Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genommen.  
+
+<center>
+
+![Weighted Round Robin](images/weighted.png)
+</center>
+
+#### Methode zur Berechnung der Weight der Berechnung
+Um die Schwierigkeit der Berechnung zu bewerten wird in beide Klassen (Fibonnaci und Pi) folgende Methode eingefügt.  
+
+	@Override
+    public int getWeight() {
+        return (int) _digits / 500;
+    }
+Diese muss natürlich auch ins Task Interface eingefügt werden.
+
+#### Weight vom Server
+Da die Server verschieden stark sein können gibt es auch hier verschiedene Weights. Diese müssen in der run Methode des Servers reduziert werden bis der Server mit der Berechnung fertig ist.  
+
+	@Override
+    public <T> T run(Task<T> task) throws RemoteException {
+        try{
+            setWeight(getWeight() - task.getWeight());
+            T result = task.run();
+            JLogger.Instance.Log(Logger.Severity.Info,
+                    _name + ": Executed Task \"" + task.toString() +
+                            "\", at " + new Date().toString());
+            return result;
+        } finally {
+            setWeight(getWeight() + task.getWeight());
+        }
+    }
 
 ## Deployment
+Um das ganze auszuführen muss man (ich verwende Intellij Idea) die Configurations ändern. Als erstes muss man den LoadBalancer starten.  
+Die Startkonfiguration vom LoadBalancer:  
+
+	Main-Class: Proxy.Main
+	VM options: wie oben beschrieben
+Bei den Clients muss man in der Konfiguration etwas mehr ändern:  
+
+	Main-Class: Client.Main
+	VM options: wie oben beschrieben
+	Programm arguments: <host> <Calculation-Method> <Length> // localhost Pi/Fibonnaci Nachkommastellen/Größe von n
+
+In dem man dann anschließend den Proxy startet, startet dieser automatisch 4 Server. Sobald der LoadBalancer (Proxy) gestartet ist kann man die Clients starten, deren Berechnungen dann per Weigted Round Robin Prinzip aufgeteilt und berechnet werden.
+	
 
 ## Quellen
 [1] https://www.jscape.com/blog/load-balancing-algorithms  
 [2] https://www.digitalocean.com/community/tutorials/what-is-high-availability  
 [3] https://www.nginx.com/resources/glossary/session-persistence/  
 [4] https://soaessentials.com/client-side-load-balancing-vs-server-side-load-balancing-how-client-side-load-balancing-works/  
-[5] Prof. Borko Erklärung :)  

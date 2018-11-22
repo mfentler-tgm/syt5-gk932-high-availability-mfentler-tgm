@@ -26,10 +26,11 @@ public class Fibonacci implements Task<BigInteger>, Serializable {
     /**
      * Die Methode gibt mir den Schwierigkeitsgrad der Berechnung zurück
      * Autor: Mario Fentler
+     *
      * @return
      */
     @Override
-    public int getWeight(){
-        return (int)_digits/500;
+    public int getWeight() {
+        return (int) _digits / 500;
     }
 }

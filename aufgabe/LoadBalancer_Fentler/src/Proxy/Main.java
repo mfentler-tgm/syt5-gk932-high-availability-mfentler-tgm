@@ -36,7 +36,7 @@ public class Main {
             for (int i = 0; i < 4; i++) {
                 _logger.Log(Logger.Severity.Debug, "Creating Processor #" + i);
                 int range = (10000 - 1000) + 1;
-                int weight =  (int)(Math.random() * range) + 500;
+                int weight = (int) (Math.random() * range) + 500;
                 Server newServer = new Server("Server" + i, port);
                 newServer.setWeight(weight);
                 balancer.add(newServer);
@@ -44,7 +44,7 @@ public class Main {
 
             ShutdownHook(balancer);
             _logger.Log(Logger.Severity.Info,
-                    "Round robin load balancer successfully bound.");
+                    "Weighted Round robin load balancer successfully bound.");
         } catch (Exception e) {
             e.printStackTrace();
             _logger.Log(e);
