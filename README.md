@@ -88,6 +88,36 @@ Da die Server verschieden stark sein können gibt es auch hier verschiedene Weig
         }
     }
 
+#### Überarbeitung LoadBalancer
+Anschließend muss noch beim LoadBalancer die Methode zur Lastverteilung überarbeitet werden. Diese soll nun bezogen auf die Weights die Tasks vergeben.  
+
+	@Override
+    public <T> T run(Task<T> t) throws RemoteException {
+        //List<Processor> available = _processors.stream()
+        //      .filter(p -> !p.busy()).collect(Collectors.toList());
+
+        do {
+
+            if (!_iter.hasNext())
+                _iter = _processors.iterator();
+
+            System.out.println("New task request...");
+            System.out.println("Task weight: " + t.getWeight());
+            while (_iter.hasNext()) {
+                Processor p = _iter.next();
+                if (!(p.getWeight() - t.getWeight() < 0)) {
+                    return p.run(t);
+
+                    //return p.run(t);
+                } else {
+                    System.out.println("Nächster Server wird ausgewählt.");
+                }
+            }
+
+            //return p.run(t);
+        } while (true);
+    }
+	
 ## Deployment
 Um das ganze auszuführen muss man (ich verwende Intellij Idea) die Configurations ändern. Als erstes muss man den LoadBalancer starten.  
 Die Startkonfiguration vom LoadBalancer:  
