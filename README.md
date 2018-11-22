@@ -57,10 +57,6 @@ Dazu wurden Getter Methoden in die Interfaces "process" und "task" eingebaut. Mi
 Für die Weight der Tasks wurde die Nachkommazahl/500 gerechnet. Das ist ein frei gewählter Wert, den man nach belieben anpassen kann.  
 Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genommen.  
 
-<center>
-
-![Weighted Round Robin](images/weighted.png)
-</center>
 
 #### Methode zur Berechnung der Weight der Berechnung
 Um die Schwierigkeit der Berechnung zu bewerten wird in beide Klassen (Fibonnaci und Pi) folgende Methode eingefügt.  
