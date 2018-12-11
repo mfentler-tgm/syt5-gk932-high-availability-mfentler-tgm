@@ -60,16 +60,17 @@ Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genomme
 
 #### Methode zur Berechnung der Weight der Berechnung
 Um die Schwierigkeit der Berechnung zu bewerten wird in beide Klassen (Fibonnaci und Pi) folgende Methode eingefügt.  
-
+```java
 	@Override
     public int getWeight() {
         return (int) _digits / 500;
     }
+```
 Diese muss natürlich auch ins Task Interface eingefügt werden.
 
 #### Weight vom Server
 Da die Server verschieden stark sein können gibt es auch hier verschiedene Weights. Diese müssen in der run Methode des Servers reduziert werden bis der Server mit der Berechnung fertig ist.  
-
+```java
 	@Override
     public <T> T run(Task<T> task) throws RemoteException {
         try{
@@ -83,10 +84,11 @@ Da die Server verschieden stark sein können gibt es auch hier verschiedene Weig
             setWeight(getWeight() + task.getWeight());
         }
     }
+```
 
 #### Überarbeitung LoadBalancer
 Anschließend muss noch beim LoadBalancer die Methode zur Lastverteilung überarbeitet werden. Diese soll nun bezogen auf die Weights die Tasks vergeben.  
-
+```java
 	@Override
     public <T> T run(Task<T> t) throws RemoteException {
         //List<Processor> available = _processors.stream()
@@ -113,7 +115,8 @@ Anschließend muss noch beim LoadBalancer die Methode zur Lastverteilung überar
             //return p.run(t);
         } while (true);
     }
-	
+```
+
 ## Deployment
 Um das ganze auszuführen muss man (ich verwende Intellij Idea) die Configurations ändern. Als erstes muss man den LoadBalancer starten.  
 Die Startkonfiguration vom LoadBalancer:  
