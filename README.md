@@ -56,10 +56,11 @@ Dazu geht man in folgende Files:
 
 __ACHTUNG!__ Das was jetzt kommt ist ein Quick n dirty Pfusch. Dieser sollte nach der Übung wieder rausgenommen werden.  
 Es wird folgender Code-Snippet oben ins File hinzugefügt:  
-
-    grant {
-        permission java.security.AllPermission;
-    };   
+```java
+grant {
+    permission java.security.AllPermission;
+};
+```   
 __Besser:__  
 In ein File den Code von oben einfügen und dann bei den VM Parametern in der Start-Konfig folgende Syntax hinzufügen. 
 Das hat den Vorteil, dass man keine Sicherheitslücken im System erstellt und die Policy nur solange gilt, solange das Programm läuft.  
@@ -76,60 +77,60 @@ Wenn der Weight-Wert des Servers nicht groß genug ist wird der nächste genomme
 #### Methode zur Berechnung der Weight der Berechnung
 Um die Schwierigkeit der Berechnung zu bewerten wird in beide Klassen (Fibonnaci und Pi) folgende Methode eingefügt.  
 ```java
-	@Override
-    public int getWeight() {
-        return (int) _digits / 500;
-    }
+@Override
+public int getWeight() {
+    return (int) _digits / 500;
+}
 ```
 Diese muss natürlich auch ins Task Interface eingefügt werden.
 
 #### Weight vom Server
 Da die Server verschieden stark sein können gibt es auch hier verschiedene Weights. Diese müssen in der run Methode des Servers reduziert werden bis der Server mit der Berechnung fertig ist.  
 ```java
-	@Override
-    public <T> T run(Task<T> task) throws RemoteException {
-        try{
-            setWeight(getWeight() - task.getWeight());
-            T result = task.run();
-            JLogger.Instance.Log(Logger.Severity.Info,
-                    _name + ": Executed Task \"" + task.toString() +
-                            "\", at " + new Date().toString());
-            return result;
-        } finally {
-            setWeight(getWeight() + task.getWeight());
-        }
+@Override
+public <T> T run(Task<T> task) throws RemoteException {
+    try{
+        setWeight(getWeight() - task.getWeight());
+        T result = task.run();
+        JLogger.Instance.Log(Logger.Severity.Info,
+                _name + ": Executed Task \"" + task.toString() +
+                        "\", at " + new Date().toString());
+        return result;
+    } finally {
+        setWeight(getWeight() + task.getWeight());
     }
+}
 ```
 
 #### Überarbeitung LoadBalancer
 Anschließend muss noch beim LoadBalancer die Methode zur Lastverteilung überarbeitet werden. Diese soll nun bezogen auf die Weights die Tasks vergeben.  
 ```java
-	@Override
-    public <T> T run(Task<T> t) throws RemoteException {
-        //List<Processor> available = _processors.stream()
-        //      .filter(p -> !p.busy()).collect(Collectors.toList());
+@Override
+public <T> T run(Task<T> t) throws RemoteException {
+    //List<Processor> available = _processors.stream()
+    //      .filter(p -> !p.busy()).collect(Collectors.toList());
 
-        do {
+    do {
 
-            if (!_iter.hasNext())
-                _iter = _processors.iterator();
+        if (!_iter.hasNext())
+            _iter = _processors.iterator();
 
-            System.out.println("New task request...");
-            System.out.println("Task weight: " + t.getWeight());
-            while (_iter.hasNext()) {
-                Processor p = _iter.next();
-                if (!(p.getWeight() - t.getWeight() < 0)) {
-                    return p.run(t);
+        System.out.println("New task request...");
+        System.out.println("Task weight: " + t.getWeight());
+        while (_iter.hasNext()) {
+            Processor p = _iter.next();
+            if (!(p.getWeight() - t.getWeight() < 0)) {
+                return p.run(t);
 
-                    //return p.run(t);
-                } else {
-                    System.out.println("Nächster Server wird ausgewählt.");
-                }
+                //return p.run(t);
+            } else {
+                System.out.println("Nächster Server wird ausgewählt.");
             }
+        }
 
-            //return p.run(t);
-        } while (true);
-    }
+        //return p.run(t);
+    } while (true);
+}
 ```
 
 ## Deployment
